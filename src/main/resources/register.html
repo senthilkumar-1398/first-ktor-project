@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            width: 350px;
+            animation: slideIn 0.5s ease-out;
+            box-sizing: border-box;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #007BFF;
+            border: none;
+            color: white;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        button.loading::after {
+            content: "";
+            border: 3px solid white;
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            text-align: center;
+            color: green;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .login-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .login-text a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .login-text a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>User Registration</h2>
+    <form id="registerForm">
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="email" name="emailId" placeholder="Email" required>
+        <input type="text" name="mobileNo" placeholder="Mobile Number" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button id="submitBtn" type="submit">Register</button>
+        <div class="success-message" id="successMessage">User Registered Successfully!</div>
+    </form>
+
+    <div class="login-text">
+        Already have an account?
+        <a href="/login">Login</a>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('registerForm');
+    const button = document.getElementById('submitBtn');
+    const successMsg = document.getElementById('successMessage');
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        button.classList.add('loading');
+        button.disabled = true;
+
+        const formData = new FormData(form);
+        const params = new URLSearchParams(formData);
+
+        try {
+            const response = await fetch('/register', {
+                method: 'POST',
+                body: params
+            });
+
+            const text = await response.text();
+            console.log('Response:', text);
+            successMsg.style.display = 'block';
+        } catch (error) {
+            alert('Error: ' + error);
+        } finally {
+            button.classList.remove('loading');
+            button.disabled = false;
+        }
+    });
+</script>
+
+</body>
+</html>
