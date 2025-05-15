@@ -36,6 +36,8 @@ dependencies {
 
     implementation("io.ktor:ktor-server-auth:2.2.0")
     implementation("io.ktor:ktor-server-auth-jwt:2.2.0")
+    implementation("io.ktor:ktor-server-thymeleaf:3.1.2")
+    implementation("org.thymeleaf:thymeleaf:3.1.2.RELEASE")
 
 
 }

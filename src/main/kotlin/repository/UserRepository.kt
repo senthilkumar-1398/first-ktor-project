@@ -6,6 +6,7 @@ import com.example.domain.model.requestmodel.Users
 import com.example.domain.model.requestmodel.toUser
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class UserRepository {
@@ -31,5 +32,22 @@ class UserRepository {
             .map { it.toUser() }
             .singleOrNull()
     }
+
+    fun getAllUsers(): List<User> = transaction {
+        Users.selectAll().map { it.toUser() }
+    }
+
+//    fun updateUser(id: Int, user: User): Boolean = transaction {
+//        Users.update({ Users.emailId eq id }) {
+//            it[name] = user.name
+//            it[email] = user.email
+//        } > 0
+//    }
+//
+//    fun deleteUser(id: Int): Unit = transaction {
+//        val deletedRows = Users.deleteWhere { Users.id eq id }
+//        deletedRows > 0
+//    }
+
 
 }
