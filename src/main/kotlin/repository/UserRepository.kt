@@ -4,9 +4,8 @@ import com.example.domain.model.requestmodel.RegisterRequest
 import com.example.domain.model.requestmodel.User
 import com.example.domain.model.requestmodel.Users
 import com.example.domain.model.requestmodel.toUser
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class UserRepository {
@@ -37,17 +36,16 @@ class UserRepository {
         Users.selectAll().map { it.toUser() }
     }
 
-//    fun updateUser(id: Int, user: User): Boolean = transaction {
-//        Users.update({ Users.emailId eq id }) {
-//            it[name] = user.name
-//            it[email] = user.email
-//        } > 0
-//    }
-//
-//    fun deleteUser(id: Int): Unit = transaction {
-//        val deletedRows = Users.deleteWhere { Users.id eq id }
-//        deletedRows > 0
-//    }
+    fun updateUser(id: Int, user: User): Boolean = transaction {
+        Users.update({ Users.id eq id }) {
+            it[name] = user.name
+            it[emailId] = user.emailId
+        } > 0
+    }
 
+    fun deleteUser(id: Int): Boolean = transaction {
+        val deletedRows = Users.deleteWhere { Users.id eq id }
+        deletedRows > 0
+    }
 
 }
