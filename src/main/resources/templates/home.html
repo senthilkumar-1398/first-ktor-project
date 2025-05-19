@@ -1,6 +1,102 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User List</title>
+    <style>
+        body {
+            display: flex;
+            font-family: Arial;
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #f2f2f2;
+            padding: 20px;
+            height: 100vh;
+        }
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+        .user-row {
+            display: flex;
+            justify-content: space-between;
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            border: 1px solid #ddd;
+        }
+        .user-info {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .icon-btn {
+            cursor: pointer;
+            color: #007bff;
+        }
+    </style>
+</head>
 <body>
-<h1 th:text="'Hello, ' + ${user.name}"></h1>
+<div class="sidebar">
+    <h2>Menu</h2>
+    <ul>
+        <li><a href="#">Users</a></li>
+    </ul>
+</div>
+
+<div class="content">
+    <h1>User List</h1>
+    <div id="userList"></div>
+</div>
+
+<script>
+    async function fetchUsers() {
+        try {
+            const response = await fetch('/api/get-all-users');
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const result = await response.json(); // <- this is the full ApiResponse
+            console.log('Full response:', result);
+
+            if (!result.status) {
+                console.error('API error:', result.message);
+                return;
+            }
+
+            const users = result.data; // ✅ extract data array
+            const userList = document.getElementById('userList');
+            userList.innerHTML = ''; // Clear existing content
+
+            users.forEach(user => {
+                const row = document.createElement('div');
+                row.className = 'user-row';
+                row.innerHTML = `
+                    <div class="user-info">
+                        <div><strong>Name:</strong> ${user.name}</div>
+                        <div><strong>Email:</strong> ${user.emailId}</div>
+                        <div><strong>Mobile:</strong> ${user.mobileNo}</div>
+                    </div>
+                    <div class="actions">
+                        <span class="icon-btn">✏️</span>
+                        <span class="icon-btn">🗑️</span>
+                    </div>
+                `;
+                userList.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error fetching users:', error);
+        }
+    }
+
+    window.onload = fetchUsers;
+</script>
 </body>
 </html>
