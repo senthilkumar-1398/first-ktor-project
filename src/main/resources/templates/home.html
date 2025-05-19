@@ -58,41 +58,71 @@
     async function fetchUsers() {
         try {
             const response = await fetch('/api/get-all-users');
-            console.log('Response status:', response.status);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
+            if (!response.ok) throw new Error('Network response was not ok');
 
-            const result = await response.json(); // <- this is the full ApiResponse
-            console.log('Full response:', result);
+            const result = await response.json();
+            if (!result.status) return alert('Error: ' + result.message);
 
-            if (!result.status) {
-                console.error('API error:', result.message);
-                return;
-            }
-
-            const users = result.data; // ✅ extract data array
+            const users = result.data;
             const userList = document.getElementById('userList');
-            userList.innerHTML = ''; // Clear existing content
+            userList.innerHTML = '';
 
             users.forEach(user => {
                 const row = document.createElement('div');
                 row.className = 'user-row';
                 row.innerHTML = `
                     <div class="user-info">
-                        <div><strong>Name:</strong> ${user.name}</div>
-                        <div><strong>Email:</strong> ${user.emailId}</div>
-                        <div><strong>Mobile:</strong> ${user.mobileNo}</div>
+                        <div><strong>Name:</strong> <input value="${user.name}" id="name-${user.id}" /></div>
+                        <div><strong>Email:</strong> <input value="${user.emailId}" id="email-${user.id}" /></div>
+                        <div><strong>Mobile:</strong> <input value="${user.mobileNo}" id="mobile-${user.id}" /></div>
                     </div>
                     <div class="actions">
-                        <span class="icon-btn">✏️</span>
-                        <span class="icon-btn">🗑️</span>
+                        <span class="icon-btn" onclick="updateUser(${user.id})">✏️</span>
+                        <span class="icon-btn" onclick="deleteUser(${user.id})">🗑️</span>
                     </div>
                 `;
                 userList.appendChild(row);
             });
         } catch (error) {
             console.error('Error fetching users:', error);
+        }
+    }
+
+    async function updateUser(id) {
+        const name = document.getElementById(`name-${id}`).value;
+        const email = document.getElementById(`email-${id}`).value;
+        const mobile = document.getElementById(`mobile-${id}`).value;
+
+        const updatedUser = { name, emailId: email, mobileNo: mobile };
+
+        try {
+            const response = await fetch(`/api/users/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedUser)
+            });
+
+            const result = await response.json();
+            alert(result.message);
+            if (result.status) fetchUsers(); // refresh list
+        } catch (e) {
+            alert('Update failed: ' + e.message);
+        }
+    }
+
+    async function deleteUser(id) {
+        if (!confirm('Are you sure you want to delete this user?')) return;
+
+        try {
+            const response = await fetch(`/api/users/${id}`, {
+                method: 'DELETE'
+            });
+
+            const result = await response.json();
+            alert(result.message);
+            if (result.status) fetchUsers(); // refresh list
+        } catch (e) {
+            alert('Delete failed: ' + e.message);
         }
     }
 
