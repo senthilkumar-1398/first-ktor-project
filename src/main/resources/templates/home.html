@@ -50,6 +50,27 @@
 </div>
 
 <div class="content">
+    <!-- Add User Button -->
+    <button onclick="showAddUserDialog()">➕ Add User</button>
+
+    <!-- Add User Dialog -->
+    <div id="addUserDialog" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background-color:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+        <div style="background:white; padding:20px; border-radius:10px; min-width:300px;">
+            <h2>Add New User</h2>
+            <label>Name:</label><br />
+            <input type="text" id="newName"><br /><br />
+            <label>Email:</label><br />
+            <input type="email" id="newEmail"><br /><br />
+            <label>Mobile:</label><br />
+            <input type="text" id="newMobile"><br /><br />
+            <label>Password:</label><br />
+            <input type="password" id="newPassword"><br /><br />
+            <button onclick="addUser()">Submit</button>
+            <button onclick="hideAddUserDialog()">Cancel</button>
+        </div>
+    </div>
+
     <h1>User List</h1>
     <div id="userList"></div>
 </div>
@@ -125,6 +146,57 @@
             alert('Delete failed: ' + e.message);
         }
     }
+
+    function showAddUserDialog() {
+    document.getElementById('addUserDialog').style.display = 'flex';
+}
+
+function hideAddUserDialog() {
+    document.getElementById('addUserDialog').style.display = 'none';
+}
+
+async function addUser() {
+    const name = document.getElementById('newName').value.trim();
+    const emailId = document.getElementById('newEmail').value.trim();
+    const mobileNo = document.getElementById('newMobile').value.trim();
+    const password = document.getElementById('newPassword').value;
+
+    if (!name || !emailId || !mobileNo || !password) {
+        alert('All fields are required');
+        return;
+    }
+
+    try {
+        const formData = new URLSearchParams();
+        formData.append("name", name);
+        formData.append("emailId", emailId);
+        formData.append("mobileNo", mobileNo);
+        formData.append("password", password);
+
+        const response = await fetch("/api/create-user", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData
+        });
+
+        const result = await response.json();
+        alert(result.message);
+        if (result.status) {
+<!--            // ✅ Clear the input fields-->
+<!--            nameInput.value = '';-->
+<!--            emailInput.value = '';-->
+<!--            mobileInput.value = '';-->
+<!--            passwordInput.value = '';-->
+
+            hideAddUserDialog();
+            fetchUsers(); // refresh list
+        }
+    } catch (error) {
+        alert("Failed to add user: " + error.message);
+    }
+}
 
     window.onload = fetchUsers;
 </script>
